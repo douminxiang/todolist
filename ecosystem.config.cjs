@@ -4,8 +4,8 @@ module.exports = {
     {
       name: 'todolist-api',
       cwd: '/var/www/todolist/server',
-      script: 'npm',
-      args: 'start',
+      script: './node_modules/.bin/tsx',
+      args: 'src/index.ts',
       instances: 1,
       autorestart: true,
       max_memory_restart: '300M',
