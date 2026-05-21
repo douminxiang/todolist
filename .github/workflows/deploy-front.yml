@@ -51,7 +51,7 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: dist.tar.gz
-          target: /tmp/
+          target: /home/deploy/
 
       - name: 清空旧文件并部署新静态资源
         uses: appleboy/ssh-action@v1.2.0
@@ -65,8 +65,8 @@ jobs:
             DEPLOY_PATH="/var/www/todolist/html"
             mkdir -p "$DEPLOY_PATH"
             rm -rf "${DEPLOY_PATH:?}"/*
-            tar -xzf /tmp/dist.tar.gz -C "$DEPLOY_PATH"
-            rm -f /tmp/dist.tar.gz
+            tar -xzf /home/deploy/dist.tar.gz -C "$DEPLOY_PATH"
+            rm -f /home/deploy/dist.tar.gz
             chmod -R a+rX "$DEPLOY_PATH"
             echo "前端已部署到: $DEPLOY_PATH"
             ls -la "$DEPLOY_PATH"

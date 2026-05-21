@@ -44,6 +44,9 @@ jobs:
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
+            # 修复 git 目录权限检查
+            git config --global --add safe.directory "$PROJECT_DIR"
+
             echo ">>> 进入项目目录: $PROJECT_DIR"
             cd "$PROJECT_DIR" || { echo "项目目录不存在"; exit 1; }
 
