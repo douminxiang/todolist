@@ -47,17 +47,17 @@ jobs:
         uses: appleboy/scp-action@v0.1.7
         with:
           host: 114.55.150.237
-          username: deploy
+          username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           source: dist.tar.gz
-          target: /home/deploy/
+          target: /tmp/
 
       - name: 清空旧文件并部署新静态资源
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: 114.55.150.237
-          username: deploy
+          username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
@@ -65,8 +65,8 @@ jobs:
             DEPLOY_PATH="/var/www/todolist/html"
             mkdir -p "$DEPLOY_PATH"
             rm -rf "${DEPLOY_PATH:?}"/*
-            tar -xzf /home/deploy/dist.tar.gz -C "$DEPLOY_PATH"
-            rm -f /home/deploy/dist.tar.gz
+            tar -xzf /tmp/dist.tar.gz -C "$DEPLOY_PATH"
+            rm -f /tmp/dist.tar.gz
             chmod -R a+rX "$DEPLOY_PATH"
             echo "前端已部署到: $DEPLOY_PATH"
             ls -la "$DEPLOY_PATH"
@@ -76,11 +76,11 @@ jobs:
         continue-on-error: true
         with:
           host: 114.55.150.237
-          username: deploy
+          username: root
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
-            sudo nginx -t && sudo systemctl reload nginx
+            nginx -t && systemctl reload nginx
             echo "Nginx 已重载"
 
       - name: 部署完成
