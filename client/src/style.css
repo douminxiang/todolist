@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  background: #f0f2f5;
+  color: #1f2937;
+}
+#app {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px;
+}
