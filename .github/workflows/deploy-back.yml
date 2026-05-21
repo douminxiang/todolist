@@ -1,9 +1,8 @@
 # =============================================================================
-# 后端自动部署流水线（Node / Express / NestJS 通用）
+# 后端自动部署流水线
 # =============================================================================
 # 触发：git push 到 main 分支（server 目录、pm2 配置或本文件变更）
-# 流程：拉取源码 → SSH 连接服务器 → git pull → 安装依赖 → pm2 重启
-# 隐私：服务器 IP、用户名、私钥、项目路径均使用 GitHub Secrets，禁止明文写入本文件
+# 唯一需要配置的 Secret：SERVER_SSH_KEY（SSH 私钥）
 # =============================================================================
 
 name: 部署后端
@@ -18,40 +17,30 @@ on:
       - '.github/workflows/deploy-back.yml'
   workflow_dispatch:
 
-env:
-  # 后端子目录（NestJS 单体仓常见为 . 或 apps/api，按实际修改）
-  SERVER_DIR: server
-
 jobs:
   deploy-backend:
     name: 部署后端到服务器
     runs-on: ubuntu-latest
 
     steps:
-      # -----------------------------------------------------------------------
-      # 第 1 步：拉取源码（用于校验仓库可用；实际部署在服务器 git pull）
-      # -----------------------------------------------------------------------
       - name: 拉取源码
         uses: actions/checkout@v4
 
-      # -----------------------------------------------------------------------
-      # 第 2 步：SSH 远程部署 — 更新代码、依赖、pm2 重启
-      # -----------------------------------------------------------------------
       - name: 远程更新代码并重启服务
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
+          host: 114.55.150.237
+          username: deploy
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: ${{ secrets.SERVER_PORT || 22 }}
+          port: 22
           command_timeout: 15m
           script: |
             set -e
 
-            PROJECT_DIR="${{ secrets.BACKEND_DEPLOY_PATH }}"
-            SERVER_DIR="${{ env.SERVER_DIR }}"
+            PROJECT_DIR="/var/www/todolist"
+            SERVER_DIR="server"
 
-            # 加载 nvm（若服务器用 nvm 安装 Node，无 nvm 可删除下面两行）
+            # 加载 nvm（若服务器用 nvm 安装 Node）
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"
 
@@ -66,9 +55,6 @@ jobs:
             echo ">>> 安装/更新后端依赖"
             cd "$PROJECT_DIR/$SERVER_DIR"
             npm ci
-
-            # NestJS / 需编译的项目：取消下面注释
-            # npm run build
 
             echo ">>> pm2 重启后端进程"
             cd "$PROJECT_DIR"
